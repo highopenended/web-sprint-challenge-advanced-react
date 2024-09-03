@@ -1,5 +1,6 @@
 import React from 'react'
 import { useState } from 'react'
+import axios from 'axios'
 
 // Suggested initial states
 const initialMessage = ''
@@ -41,6 +42,7 @@ export default function AppFunctional(props) {
     setIndex(initialIndex)
     setMessage(initialMessage)
     setStepCount(initialSteps)
+    setEmail(initialEmail)
   }
 
   function getNextIndex(direction) {
@@ -67,7 +69,7 @@ export default function AppFunctional(props) {
   function move(evt) {
     const direction = evt.target.id
     const squareArr = document.getElementById('grid').childNodes
-    let currIdx, newIdx, newSteps, newMsg 
+    let currIdx, newIdx, newSteps, newMsg
 
     for (let i = 0; i < squareArr.length; i++) {
       const square = squareArr[i];
@@ -93,18 +95,35 @@ export default function AppFunctional(props) {
 
   function onChange(evt) {
     // You will need this to update the value of the input.
-    setEmail(evt.value)
+    setEmail(evt.target.value)
   }
   function onSubmit(evt) {
-    evt.preventDefault()
     // Use a POST request to send a payload to the server.
+    evt.preventDefault()
+
+    let arr=indexToXY(index)
+    let x=arr[0]
+    let y=arr[1]
+    axios.post("http://localhost:9000/api/result",{
+      x:arr[0],
+      y:arr[1],
+      steps:stepCount,
+      email:email
+    })
+    .then(function(resp){
+      setMessage(resp.data.message)
+    })
+    .catch(function(err){
+      setMessage(err.response.data.message)
+    })
+    setEmail(initialEmail)
   }
 
   return (
     <div id="wrapper" className={props.className}>
       <div className="info">
         <h3 id="coordinates">{`Coordinates (${indexToXY(index)[0]}, ${indexToXY(index)[1]})`}</h3>
-        <h3 id="steps">{`You moved ${stepCount} times`}</h3>
+        <h3 id="steps">{`You moved ${stepCount} time${stepCount!==1?'s':''}`}</h3>
       </div>
       <div id="grid">
         {
