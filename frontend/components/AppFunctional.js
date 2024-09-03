@@ -2,23 +2,19 @@ import React from 'react'
 import { useState } from 'react'
 import axios from 'axios'
 
-// Suggested initial states
 const initialMessage = ''
 const initialEmail = ''
 const initialSteps = 0
 const initialIndex = 4 // the index the "B" is at
 
 export default function AppFunctional(props) {
-  // THE FOLLOWING HELPERS ARE JUST RECOMMENDATIONS.
-  // You can delete them and build your own logic from scratch.
 
   const [index, setIndex] = useState(initialIndex);
   const [message, setMessage] = useState(initialMessage);
   const [stepCount, setStepCount] = useState(0);
-
   const [email, setEmail] = useState(initialEmail)
 
-  
+
   function indexToXY(index){
     let x = (index % 3) + 1
     let y = Math.floor(index / 3) + 1
@@ -29,16 +25,11 @@ export default function AppFunctional(props) {
     return x + ((y-1)*3)-1
   }
 
-
   function getXYMessage(direction) {
-    // It it not necessary to have a state to track the "Coordinates (2, 2)" message for the user.
-    // You can use the `getXY` helper above to obtain the coordinates, and then `getXYMessage`
-    // returns the fully constructed string.
     return `You can't go ${direction}`
   }
 
   function reset() {
-    // Use this helper to reset all states to their initial values.
     setIndex(initialIndex)
     setMessage(initialMessage)
     setStepCount(initialSteps)
@@ -84,38 +75,27 @@ export default function AppFunctional(props) {
     }else{
       newSteps=stepCount+1
       newMsg=''
-    }
-    
+    }    
     setIndex(newIdx)
     setMessage(newMsg)
     setStepCount(newSteps)
   }
 
-
-
   function onChange(evt) {
-    // You will need this to update the value of the input.
     setEmail(evt.target.value)
   }
-  function onSubmit(evt) {
-    // Use a POST request to send a payload to the server.
-    evt.preventDefault()
 
+  function onSubmit(evt) {
+    evt.preventDefault()
     let arr=indexToXY(index)
-    let x=arr[0]
-    let y=arr[1]
     axios.post("http://localhost:9000/api/result",{
       x:arr[0],
       y:arr[1],
       steps:stepCount,
       email:email
     })
-    .then(function(resp){
-      setMessage(resp.data.message)
-    })
-    .catch(function(err){
-      setMessage(err.response.data.message)
-    })
+    .then(function(resp){setMessage(resp.data.message)})
+    .catch(function(err){setMessage(err.response.data.message)})
     setEmail(initialEmail)
   }
 
